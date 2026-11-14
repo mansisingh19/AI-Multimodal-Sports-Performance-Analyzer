@@ -1,90 +1,357 @@
 # AI-Based Multimodal Sports Performance Assessment System
 
-Upload a cricket or badminton video. The system finds the player's body keypoints, recognises the
-shot, measures the technique, scores it out of 100 and gives coaching feedback on a web dashboard.
+An AI-powered sports performance analysis system that evaluates an athlete's technique from video using **Computer Vision, Deep Learning, Machine Learning, and multimodal feature fusion**.
 
-## What is included (and what is not)
+The system currently supports **Cricket and Badminton** analysis. It extracts body keypoints from sports videos, recognises the performed action/shot, calculates biomechanical and motion-based features, generates a performance score, and provides technique-oriented feedback through an interactive Streamlit dashboard.
 
-| Part | Status |
+---
+
+##  Key Features
+
+-  **Video-based Sports Analysis**
+-  **Human Pose Estimation** using MediaPipe
+-  **Optional YOLO-based Tracking**
+-  **Cricket Shot Recognition**
+-  **Badminton Action Recognition**
+-  **GRU-based Action Recognition Model**
+-  **Biomechanical Feature Extraction**
+  - Joint angles
+  - Balance
+  - Rotation
+  - Movement-related features
+-  **Motion Analysis** using frame-level motion information
+-  **Multimodal Feature Fusion**
+-  **Machine Learning-based Performance Scoring**
+-  **Rule-based Coaching Feedback**
+-  **Evaluation Metrics**
+-  **Interactive Streamlit Dashboard**
+-  **SQLite-based Analysis History**
+
+---
+
+##  System Architecture
+
+```text
+                    Sports Video
+                         │
+                         ▼
+                  Video Processing
+                         │
+                         ▼
+              Pose Estimation / Tracking
+                         │
+                         ▼
+                33 Body Keypoints
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+   Pose Features    Motion Features   Action Model
+   / Biomechanics   Frame Differences      │
+          │              │             Shot Type
+          │              │             + Confidence
+          └──────────────┼──────────────┘
+                         ▼
+                  Feature Fusion
+                         │
+                         ▼
+            Machine Learning Scorer
+                         │
+                         ▼
+               Performance Score
+                    /100
+                         │
+                         ▼
+                Feedback Engine
+                         │
+                         ▼
+                Streamlit Dashboard
+```
+
+---
+
+##  Multimodal Approach
+
+The system combines multiple information sources extracted from the same sports video:
+
+| Modality | Extracted Information |
 |---|---|
-| Pose extraction (MediaPipe, optional YOLO tracking), features, GRU action model, ML scorer, feedback engine, Streamlit dashboard, SQLite history, evaluation metrics | Written |
-| Training data (videos) and score labels | **You must collect these.** No code can replace them. |
-| Trained models | **You train them** (about 1 hour on Colab once data is ready). |
+| **Pose** | Body/joint keypoints and movement geometry |
+| **Biomechanics** | Joint angles, balance, rotation and related features |
+| **Video Motion** | Frame-level motion information |
+| **Action Recognition** | Shot/action type and model confidence |
+| **Deep Features** | Representation learned by the GRU action model |
 
-Tested here on fake data: features, scoring, feedback, database. **Not tested here:** the PyTorch
-action model, real video pose extraction and the Streamlit app (these need torch, mediapipe 0.10.14 and a real video).
-Run `python tests/smoke_test.py` on your machine first; it checks everything on fake data.
+These features are combined through a **feature-fusion pipeline** before performance scoring.
 
-## How it works
+---
 
+##  Tech Stack
+
+### Programming
+- Python
+
+### Computer Vision
+- OpenCV
+- MediaPipe
+- YOLOv8
+
+### Deep Learning
+- PyTorch
+- GRU-based action recognition
+
+### Machine Learning
+- Scikit-learn
+- Random Forest
+- Gradient Boosting
+- XGBoost
+
+### Application
+- Streamlit
+
+### Data & Storage
+- NumPy
+- Pandas
+- SQLite
+
+### Development
+- VS Code
+- Google Colab
+
+---
+
+##  Project Structure
+
+```text
+AI-Multimodal-Sports-Performance-Analyzer/
+│
+├── app/
+│   ├── label_tool.py
+│   └── streamlit_app.py
+│
+├── data/
+│   ├── keypoints/
+│   ├── labels/
+│   └── raw_videos/
+│
+├── models/
+│
+├── scripts/
+│   ├── extract_dataset.py
+│   ├── train_action.py
+│   ├── train_scoring.py
+│   ├── make_label_template.py
+│   └── analyze_video.py
+│
+├── src/
+│   ├── config.py
+│   ├── pose.py
+│   ├── features.py
+│   ├── action_model.py
+│   ├── scoring.py
+│   ├── feedback.py
+│   ├── pipeline.py
+│   └── db.py
+│
+├── tests/
+│   └── smoke_test.py
+│
+├── yolov8n.pt
+├── requirements.txt
+├── README.md
+└── .gitignore
 ```
-Video -> frames -> (optional YOLO tracking) -> MediaPipe pose (33 keypoints)
-   -> GRU action recogniser  : shot type + confidence        (Deep Learning)
-   -> biomechanical features : angles, balance, rotation...  (numerical modality)
-   -> motion energy          : frame differences             (video modality)
-   -> fusion: features + motion + action probabilities + GRU embedding
-   -> RandomForest / GradientBoosting / XGBoost : scores     (Machine Learning)
-   -> rule-based feedback -> Streamlit dashboard
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/mansisingh19/AI-Multimodal-Sports-Performance-Analyzer.git
+cd AI-Multimodal-Sports-Performance-Analyzer
 ```
 
-## Setup
+### 2. Create a virtual environment
 
 ```bash
 python -m venv venv
-venv\Scripts\activate            # Windows   (Mac/Linux: source venv/bin/activate)
+```
+
+### 3. Activate the environment
+
+**Windows:**
+
+```bash
+venv\Scripts\activate
+```
+
+**macOS / Linux:**
+
+```bash
+source venv/bin/activate
+```
+
+### 4. Install dependencies
+
+```bash
 pip install -r requirements.txt
-python tests/smoke_test.py       # should end with ALL CHECKS PASSED
-```
-On Colab, use `pip install mediapipe==0.10.14` (newer versions removed the API this project uses).
-
-## Step-by-step use (cricket example)
-
-1. **Collect videos** into `data/raw_videos/cricket/<action>/`, for example
-   `cover_drive`, `pull_shot`, `defensive_shot`. Use one fixed camera view. Aim for 50+ clips per action,
-   each clip trimmed to one shot. Check the licence of any public dataset you use.
-2. **Extract keypoints:** `python scripts/extract_dataset.py --sport cricket`
-3. **Train the action model:** `python scripts/train_action.py --sport cricket`
-   (prints accuracy, precision, recall, F1; saves the confusion matrix in `models/cricket/`).
-4. **Create the label sheet:** `python scripts/make_label_template.py --sport cricket`
-   Then have a coach or experienced player rate each clip 0-100 for every parameter in
-   `data/labels/cricket_scores.csv`. Use 2 raters if you can and average them. Fill `player_id` if you know it.
-   Label at least 100-300 clips.
-5. **Train the scoring model:** `python scripts/train_scoring.py --sport cricket`
-   (compares RandomForest, GradientBoosting and XGBoost with cross-validation: MAE, RMSE, R2).
-6. **Test on one video:** `python scripts/analyze_video.py --sport cricket --video clip.mp4`
-7. **Run the dashboard:** `streamlit run app/streamlit_app.py`
-8. **Badminton:** repeat steps 1-7 with `--sport badminton`. Nothing in the code changes.
-
-## Adding a new sport
-Add one entry in `src/config.py` (`SPORTS`) with its actions and score parameters. Put videos in
-`data/raw_videos/<sport>/<action>/` and follow the same steps. Add advice text for new parameters in `src/feedback.py`.
-
-## Folder map
-```
-src/config.py        sports, actions, parameters, paths
-src/pose.py          video -> keypoints, tracking, skeleton drawing
-src/features.py      angles, balance, rotation... and the sequence for the GRU
-src/action_model.py  GRU classifier, training, evaluation, inference
-src/scoring.py       fusion + ML scorer + model comparison
-src/feedback.py      rule-based coaching text
-src/pipeline.py      full video -> result
-src/db.py            SQLite history
-app/streamlit_app.py dashboard
-scripts/             extract, label template, train, analyze
-tests/               smoke test on fake data
 ```
 
-## Limitations to state in your report
-- Keypoints come from MediaPipe; they are less accurate with blur, occlusion or low resolution.
-- Joint angles depend on the camera view; train and test with the same view, or label several views separately.
-- The scorer can only be as good as the human labels. Report how many raters, and how much they agreed.
-- Small datasets overfit. Split by player (use `player_id`) so the same person is not in training and testing.
-- Score labels are subjective; the model learns the raters' opinion, not an absolute truth.
-- "Multimodal" here means fusing video motion, pose sequence, and numerical features. All come from one video; say this openly.
-- Speed features are per frame; keep the same frame rate across clips.
+---
 
-## Suggested report outline
-1 Introduction and objectives. 2 Literature review (pose estimation, action recognition). 3 System architecture (diagram above).
-4 Dataset and labelling method. 5 Methodology (pose, features, GRU, scorer, fusion). 6 Implementation (Streamlit, SQLite).
-7 Results: `models/<sport>/action_metrics.json`, `confusion_matrix.png`, `scoring_comparison.csv`, top features in `scoring_metrics.json`.
-8 Limitations. 9 Future scope (more sports, real-time, wearable sensors, LLM feedback).
+##  Running the Project
+
+Run the smoke test first:
+
+```bash
+python tests/smoke_test.py
+```
+
+Then launch the Streamlit dashboard:
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+---
+
+##  Cricket Workflow
+
+The project follows the following pipeline for cricket:
+
+```text
+Sports Video
+     ↓
+Pose / Keypoint Extraction
+     ↓
+Feature Extraction
+     ↓
+Action Recognition
+     ↓
+Feature Fusion
+     ↓
+Performance Scoring
+     ↓
+Technique Feedback
+     ↓
+Streamlit Dashboard
+```
+
+Example cricket actions can include:
+
+- Cover Drive
+- Pull Shot
+- Defensive Shot
+
+The exact actions depend on the configured dataset.
+
+---
+
+##  Badminton Workflow
+
+The same pipeline can be used for badminton:
+
+```text
+Badminton Video
+      ↓
+Pose Extraction
+      ↓
+Feature Extraction
+      ↓
+Action Recognition
+      ↓
+Performance Scoring
+      ↓
+Feedback
+```
+
+The sport-specific actions and scoring parameters are configured within the project.
+
+---
+
+##  Model Evaluation
+
+The project includes evaluation of the action-recognition and scoring components.
+
+Action recognition can be evaluated using:
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- Confusion Matrix
+
+The scoring pipeline can compare:
+
+- Random Forest
+- Gradient Boosting
+- XGBoost
+
+using metrics such as:
+
+- MAE
+- RMSE
+- R²
+
+---
+
+##  Dataset
+
+The project is designed to work with sports video datasets organised by:
+
+```text
+data/
+└── raw_videos/
+    ├── cricket/
+    │   ├── cover_drive/
+    │   ├── pull_shot/
+    │   └── defensive_shot/
+    │
+    └── badminton/
+        └── ...
+```
+
+For meaningful performance scoring, videos need corresponding human-assigned score labels.
+
+The repository does **not** include the complete raw-video dataset.
+
+---
+
+##  Limitations
+
+- Pose estimation accuracy can decrease with blur, occlusion, or low-resolution videos.
+- Joint-angle measurements depend on camera viewpoint.
+- The quality of the performance scorer depends on the quality and consistency of human-provided labels.
+- Small datasets can lead to overfitting.
+- Sports performance scores are subjective and represent the characteristics of the training labels rather than an absolute measure of athletic ability.
+- The current multimodal system combines multiple feature types derived from the same video rather than independent sensor modalities.
+
+---
+
+##  Future Scope
+
+Potential improvements include:
+
+- Real-time sports performance analysis
+- Support for additional sports
+- Multi-camera analysis
+- Wearable sensor integration
+- Temporal transformer-based action recognition
+- More advanced biomechanical analysis
+- Athlete progress tracking
+- Personalized training recommendations
+- LLM-powered coaching feedback
+- Cloud deployment
+- Mobile application
+
+---
+
+##  Project Objective
+
+The goal of this project is to demonstrate how **Computer Vision, Deep Learning, Machine Learning, and multimodal feature fusion** can be combined to create an automated sports performance assessment system.
+
+Instead of simply identifying an action, the system aims to analyse **how the action was performed**, quantify relevant movement characteristics, generate a performance score, and provide actionable feedback.
+
+---
+
