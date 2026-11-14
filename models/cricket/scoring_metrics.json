@@ -1,0 +1,106 @@
+{
+  "sport": "cricket",
+  "n_clips": 80,
+  "best_model": "RandomForest",
+  "cv_folds": 5,
+  "comparison": [
+    {
+      "model": "RandomForest",
+      "MAE": 17.072708333333335,
+      "RMSE": 20.490020323815454,
+      "R2": -0.06466186736020203,
+      "MAE_balance": 16.589999999999996,
+      "MAE_footwork": 16.86625,
+      "MAE_posture": 16.55833333333333,
+      "MAE_head_stability": 19.028333333333332,
+      "MAE_follow_through": 16.495416666666667,
+      "MAE_action_execution": 16.897916666666667
+    },
+    {
+      "model": "GradientBoosting",
+      "MAE": 17.538619360466765,
+      "RMSE": 21.895004682968302,
+      "R2": -0.21917343573981593,
+      "MAE_balance": 16.509726880883093,
+      "MAE_footwork": 17.13362389675013,
+      "MAE_posture": 15.462339709532717,
+      "MAE_head_stability": 20.145559722903364,
+      "MAE_follow_through": 17.64997547448997,
+      "MAE_action_execution": 18.330490478241295
+    },
+    {
+      "model": "XGBoost",
+      "MAE": 17.577263220151266,
+      "RMSE": 21.68942467520642,
+      "R2": -0.19460373261405906,
+      "MAE_balance": 16.41489553451538,
+      "MAE_footwork": 16.82396674156189,
+      "MAE_posture": 16.266054391860962,
+      "MAE_head_stability": 20.433821725845338,
+      "MAE_follow_through": 17.24482116699219,
+      "MAE_action_execution": 18.280019760131836
+    }
+  ],
+  "top_features": [
+    {
+      "feature": "elbow_active_max",
+      "importance": 0.05209090580013323
+    },
+    {
+      "feature": "wrist_jerk",
+      "importance": 0.05198559745360678
+    },
+    {
+      "feature": "emb_6",
+      "importance": 0.044481046419524266
+    },
+    {
+      "feature": "head_motion",
+      "importance": 0.03844403543627852
+    },
+    {
+      "feature": "emb_1",
+      "importance": 0.03704736001421277
+    },
+    {
+      "feature": "emb_3",
+      "importance": 0.03221835876435059
+    },
+    {
+      "feature": "elbow_mean",
+      "importance": 0.030392572796111166
+    },
+    {
+      "feature": "base_width",
+      "importance": 0.02778252931569671
+    },
+    {
+      "feature": "wrist_height_end",
+      "importance": 0.024388621423396872
+    },
+    {
+      "feature": "separation_max",
+      "importance": 0.02415711081239658
+    },
+    {
+      "feature": "wrist_height_max",
+      "importance": 0.02400104408604135
+    },
+    {
+      "feature": "lean_mean_abs",
+      "importance": 0.023273385554118772
+    },
+    {
+      "feature": "wrist_speed_ratio",
+      "importance": 0.02308776613512444
+    },
+    {
+      "feature": "com_offset_std",
+      "importance": 0.022344837478456336
+    },
+    {
+      "feature": "emb_4",
+      "importance": 0.02230490516591278
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "sport": "cricket",
+  "classes": [
+    "cover_drive",
+    "pull_shot",
+    "defensive_shot"
+  ],
+  "n_train": 367,
+  "n_val": 79,
+  "n_test": 79,
+  "best_val_accuracy": 0.8227848101265823,
+  "test_accuracy": 0.759493670886076,
+  "test_precision_macro": 0.7586049951641348,
+  "test_recall_macro": 0.758784425451092,
+  "test_f1_macro": 0.7549476967658283,
+  "confusion_matrix": [
+    [
+      15,
+      8,
+      3
+    ],
+    [
+      4,
+      22,
+      1
+    ],
+    [
+      2,
+      1,
+      23
+    ]
+  ],
+  "epochs_run": 75
+}
